@@ -1,0 +1,59 @@
+Review Questions
+
+1. In 32-bit mode, aside from the stack pointer (ESP), what other register points to variables on the stack?
+ * EBP (Base Pointer)
+2. Name at least four CPU status flags.
+ * Carry Flag (CF)
+ * Parity Flag (PF)
+ * Auxiliary Carry Flag (AF)
+ * Zero Flag (ZF)
+ * Sign Flag (SF)
+ * Overflow Flag (OF)
+3. Which flag is set when the result of an unsigned arithmetic operation is too large to fit into the destination?
+ * Carry Flag (CF)
+4. Which flag is set when the result of a signed arithmetic operation is either too large or too small to fit into the destination?
+ * Overflow Flag (OF)
+5. (True/False): When a register operand size is 32 bits and the REX prefix is used, the R8D register is available for programs to use.
+ * True
+6. Which flag is set when an arithmetic or logical operation generates a negative result?
+ * Sign Flag (SF)
+7. Which part of the CPU performs floating-point arithmetic?
+ * The Floating-Point Unit (FPU) or coprocessor.
+8. On a 32-bit processor, how many bits are contained in each floating-point data register?
+ * 80 bits
+9. (True/False): The x86-64 instruction set is backward-compatible with the x86 instruction set.
+ * True
+10. (True/False): In current 64-bit chip implementations, all 64 bits are used for addressing.
+ * False (Currently, only the lower 48 bits are typically used for addressing in x86-64, although this can change in the future).
+11. (True/False): The Itanium chip instruction set is completely different from the x86 instruction set.
+ * True
+12. (True/False): Static RAM is usually less expensive than dynamic RAM.
+ * False (Static RAM is faster and more expensive than Dynamic RAM).
+13. (True/False): The 64-bit RDI register is available when the REX prefix is used.
+ * False (The RDI register is part of the x86-64 architecture and does not require a REX prefix to be used, unlike registers like R8 through R15).
+14. (True/False): In native 64-bit mode, you can use 16-bit real mode, but not the virtual-8086 mode.
+ * False (In native 64-bit mode, neither 16-bit real mode nor virtual-8086 mode is available).
+15. (True/False): The x86-64 processors have 4 more general-purpose registers than the x86 processors.
+ * True (x86-64 has 16 general-purpose registers, while x86 has 8).
+16. (True/False): The 64-bit version of Microsoft Windows does not support virtual-8086 mode.
+ * True
+17. (True/False): DRAM can only be erased using ultraviolet light.
+ * False (This describes EPROM, not DRAM. DRAM is erased and rewritten electronically.)
+18. (True/False): In 64-bit mode, you can use up to eight floating-point registers.
+ * False (The x86-64 architecture provides eight new SSE/SSE2 registers, bringing the total to 16 floating-point registers.)
+19. (True/False): A bus is a plastic cable that is attached to the motherboard at both ends, but does not sit directly on the motherboard.
+ * False (A bus is a collection of wires or traces on the motherboard itself that allows communication between components. While cables can connect devices to the bus, the bus itself is an integral part of the motherboard's design.)
+20. (True/False): CMOS RAM is the same as static RAM, meaning that it holds its value without any extra power or refresh cycles.
+ * False (CMOS RAM is a type of static RAM, but it requires a continuous power source, typically a small battery, to retain its data.)
+21. (True/False): PCI connectors are used for graphics cards and sound cards.
+ * True (PCI, and its successor PCIe, are common expansion slots for various add-in cards, including graphics and sound cards.)
+22. (True/False): The 8259A is a controller that handles external interrupts from hardware devices.
+ * True
+23. (True/False): The acronym PCI stands for programmable component interface.
+ * False (PCI stands for Peripheral Component Interconnect.)
+24. (True/False): VRAM stands for virtual random access memory.
+ * False (VRAM stands for Video Random Access Memory.)
+25. At which level(s) can an assembly language program manipulate input/output?
+ * An assembly language program can manipulate I/O at the device driver level and the port level. It can directly access and control I/O ports and registers of hardware devices.
+26. Why do game programs often send their sound output directly to the sound card's hardware ports?
+ * Games often send sound directly to the sound card's hardware ports to bypass the operating system's audio mixer, reducing latency and improving performance. This allows the game to have more precise control over the audio, which is crucial for real-time sound effects and music.
