@@ -1,0 +1,65 @@
+ 1. Provide examples of three different instruction mnemonics.
+ADD, SUB, MOV
+ 2. What is a calling convention, and how is it used in assembly language declarations?
+A calling convention determines how parameters are passed to subroutines, and how the stack is
+restored after the subroutine call.
+ 3. How do you reserve space for the stack in a program?
+By subtracting a value from the stack pointer register.
+ 4. Explain why the term assembler language is not quite correct.
+Assembler means the program that translates your source code. A more correct term is "assembly
+language".
+ 5. Explain the difference between big endian and little endian. Also, look up the origins of this
+ term on the Web.
+Little endian places the least significant bit in position 0, on the right side of the number. Big endian does the opposite.
+ 6. Why might you use a symbolic constant rather than an integer literal in your code?
+An integer literal, such as 35, has no direct meaning to someone reading the program's source code.
+Instead, a symbolic constant such as MIN_CAPACITY can be assigned an integer value, and is self documenting.
+ 7. How is a source file different from a listing file?
+A source file is given as input to the assembler. A listing file has additional text that will not
+assemble. It is a file that is created by the assembler.
+ 8. How are data labels and code labels different?
+Data labels exist in the data segment as variable offsets. Code labels are in the code segment, and are offsets for transfer of control instructions
+ 9. (True): An identifier cannot begin with a numeric digit.
+ 10. (False): A hexadecimal literal may be written as 0x3A.
+False (this notation is used in C, but not in assembly language)
+ 11. (False): Assembly language directives execute at runtime.
+ 12. (True): Assembly language directives can be written in any combination of uppercase
+ and lowercase letters.
+ 13. Name the four basic parts of an assembly language instruction.
+Label, mnemonic, operand(s), comment
+ 14. (True): MOV is an example of an instruction mnemonic.
+ 15. (True): A code label is followed by a colon (:), but a data label does not end with a 
+colon.
+ 16. Show an example of a block comment.
+COMMENT !
+first line comment
+second line comment
+ 17. Why is it not a good idea to use numeric addresses when writing instructions that access 
+variables?
+You do not use numeric addresses (offsets) for variables because the addresses would change if new variables were inserted before the existing ones.
+3.9
+  Review Questions and Exercises
+ 93
+ 18. What type of argument must be passed to the ExitProcess procedure?
+Doubleword, a return code of value 0
+ 19. Which directive ends a procedure?
+ENDP directive
+ 20. In 32-bit mode, what is the purpose of the identifier in the END directive?
+Purpose of the Identifier in the END Directive in 32-bit Mode: In 32-bit mode, the identifier in the END directive serves as a label that marks the end of the procedure. This label is used to identify the specific procedure that is being ended.
+ 21. What is the purpose of the PROTO directive?
+Prototypes a function or procedure
+
+ 22. (False): An Object file is produced by the Linker.
+ 23. (True): A Listing file is produced by the Assembler.
+ 24. (True): A link library is added to a program just before producing an Execut
+able file.
+ 25. Which data directive creates a 32-bit signed integer variable?
+Int,DD (Define Doubleword),SDWORD
+ 26. Which data directive creates a 16-bit signed integer variable?
+DW (Define Word),SWORD
+ 27. Which data directive creates a 64-bit unsigned integer variable?
+QWORD
+ 28. Which data directive creates an 8-bit signed integer variable?
+SBYTE
+ 29. Which data directive creates a 10-byte packed BCD variable
+TBYTE
