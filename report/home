@@ -1,0 +1,27 @@
+.386
+.model flat, stdcall
+option casemap:none
+
+includelib kernel32.lib
+ExitProcess proto :DWORD
+WriteConsoleA proto :DWORD, :DWORD, :DWORD, :DWORD, :DWORD
+
+.data
+msg db "학번: 202312345", 0Ah, 0
+bytesWritten dd ?
+
+.code
+main PROC
+    push -11                 ; STD_OUTPUT_HANDLE
+    call GetStdHandle
+    push 0
+    lea eax, msg
+    push eax
+    push (SIZEOF msg)-1
+    push eax
+    push eax
+    call WriteConsoleA
+    push 0
+    call ExitProcess
+main ENDP
+END main
