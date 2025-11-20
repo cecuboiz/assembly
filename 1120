@@ -1,0 +1,39 @@
+8.10
+
+1. Which statements belong in a procedure’s epilogue when the procedure has stack parameters and local variables? 
+The epilogue contains:
+	•	mov esp, ebp
+	•	pop ebp
+	•	ret (or ret n for stdcall)
+
+2. When a C function returns a 32-bit integer, where is the return value stored?
+
+It is stored in the EAX register.
+
+3. How does a program using the STDCALL calling convention clean up the stack after a procedure call?
+
+The callee cleans up the stack using ret n.
+
+4. How is the LEA instruction more powerful than the OFFSET operator?
+
+OFFSET gives a static address at compile time, while LEA can compute effective addresses dynamically at runtime.
+
+5. How much stack space is used by a variable of type int (in the example)?
+
+An int uses 4 bytes.
+
+6. What advantages does the C calling convention have over STDCALL?
+
+cdecl (C calling convention) allows variable arguments (like printf) because the caller cleans the stack.
+
+7. (True/False) When using the PROC directive, all parameters must be listed on the same line.
+
+False. They do not have to be on the same line.
+
+8. (True/False) Passing a byte-array offset to a word-pointer parameter will cause an assembler error.
+
+False. The assembler usually does not treat this as an error.
+
+9. (True/False) Passing an immediate value to a reference parameter can cause a general-protection fault.
+
+True. A reference parameter expects a valid memory address, not an immediate value.
