@@ -1,0 +1,611 @@
+9.9.1 Short Answer
+1. Which Direction flag setting causes index registers to move backward through memory when executing string primitives?
+
+Answer: DF = 1 (Direction Flag set).
+
+
+2. When a repeat prefix is used with STOSW, what value is added to or subtracted from the index register?
+
+Answer: ±2 (increments or decrements EDI by 2 depending on DF).
+
+3. In what way is the CMPS instruction ambiguous?
+
+Answer: It does not specify the operand size; size must be shown with CMPSB, CMPSW, or CMPSD.
+
+
+4. When the Direction flag is clear and SCASB has found a matching character, where does EDI point?
+
+Answer: To the byte after the matched character.
+
+5. When scanning an array for the first occurrence of a particular character, which repeat prefix would be best?
+
+Answer: REPNE (or REPNZ).
+
+6. What Direction flag setting is used in the Str_trim procedure from Section 9.3?
+
+Answer: DF = 0 (CLD is used).
+
+7. Why does the Str_trim procedure from Section 9.3 use the JNE instruction?
+
+Answer: To continue scanning until a matching character (zero byte) is found.
+8. What happens in the Str_ucase procedure from Section 9.3 if the target string contains a digit?
+
+Answer: Nothing changes; digits are ignored.
+
+9. If the Str_length procedure from Section 9.3 used SCASB, which repeat prefix would be most appropriate?
+
+Answer: REPNE.
+
+10. If the Str_length procedure from Section 9.3 used SCASB, how would it calculate and return the string length?
+
+Answer: By subtracting the starting address from EDI and subtracting 1:
+length = EDI – start – 1
+
+11. What is the maximum number of comparisons needed by the binary search algorithm when an array contains 1,024 elements?
+
+Answer: 10 comparisons (log₂1024 = 10).
+
+12. In the FillArray procedure from the Binary Search example in Section 9.5, why must the Direction flag be cleared by the CLD instruction?
+
+Answer: To make STOS instructions increase the index (forward direction).
+
+13. In the BinarySearch procedure from Section 9.5, why could the statement at label L2 be removed without affecting the outcome?
+
+Answer: It is redundant because the logic already ensures the correct control flow.
+
+14. In the BinarySearch procedure from Section 9.5, how might the statement at label L4 be eliminated?
+
+Answer: By adjusting the comparison and jump instructions so that L4 becomes unnecessary.
+
+9.9.2 Algorithm Workbench – Questions & Answers
+1. Show an example of a base-index operand in 32-bit mode.
+
+Answer:[EBX + ESI]
+
+2. Show an example of a base-index-displacement operand in 32-bit mode.
+
+Answer:[EBX + ESI + 8]
+
+
+3. Expression using ESI and EDI addressing the 3rd column of the 2nd row (doublewords, 3×4).
+
+Row size = 4 columns × 4 bytes = 16 bytes
+Answer:[ESI + 16 + 8]   ; second row + third column
+
+4. Instructions using CMPSW to compare two 16-bit arrays sourcew and targetw.
+
+Answer:cld
+mov esi, OFFSET sourcew
+mov edi, OFFSET targetw
+mov ecx, LENGTHOF sourcew
+repe cmpsw
+
+5. Use SCASW to scan for 0100h in wordArray and return the offset in EAX.
+
+Answer:mov ax, 0100h
+mov edi, OFFSET wordArray
+mov ecx, LENGTHOF wordArray
+repne scasw
+jnz notFound
+sub edi, 2
+mov eax, edi
+
+6. Use Str_compare to determine the larger string and print it.
+
+Answer:INVOKE Str_compare, ADDR str1, ADDR str2
+jg printStr1
+jl printStr2
+
+7. Call Str_trim to remove trailing “@” characters.
+
+Answer:INVOKE Str_trim, ADDR myString, '@'
+
+8. Modify Str_ucase so it converts to lowercase.
+
+Answer:
+Replace uppercase conversion logic with:cmp al, 'A'
+jb  skip
+cmp al, 'Z'
+ja  skip
+add al, 32     ; convert to lowercase
+
+Create a 64-bit version of Str_trim.
+
+Answer (short form): Use RDI/RSI, RAX, RCX and the same logic but 64-bit registers.
+
+(I can write the full 64-bit procedure if you want.)
+
+10. Show a base-index operand in 64-bit mode.
+
+Answer:[RAX + RDI]
+
+11. Move myArray[row][col] into EAX (32-bit).
+
+Each element = 4 bytes
+Answer:mov eax, myArray[ebx*COL_COUNT*4 + edi*4]
+12. Move myArray[row][col] into RAX (64-bit).
+
+Each element = 8 bytes
+Answer:mov rax, myArray[rbx*COL_COUNT*8 + rdi*8]
+
+
+9.10 Programming Exercises – Solutions
+
+
+1. Improved Str_copyN Procedure (copy up to N characters)
+Description:
+
+Copy from source to destination, but stop if:
+
+you copied N characters
+
+OR you hit null terminator.
+
+Code:Str_copyN PROC
+    ; ECX = count
+    ; ESI = source
+    ; EDI = destination
+
+    push esi
+    push edi
+    push ecx
+
+    cld
+copyLoop:
+    cmp ecx, 0
+    je  done
+
+    lodsb
+    cmp al, 0
+    je  nullFound
+
+    stosb
+    dec ecx
+    jmp copyLoop
+
+nullFound:
+    mov al, 0
+    stosb
+
+done:
+    pop ecx
+    pop edi
+    pop esi
+    ret
+Str_copyN ENDP
+2. Str_concat Procedure
+Description:
+
+Append source to the end of target.
+
+Code:
+Str_concat PROC
+    ; EDI = target
+    ; ESI = source
+    mov edi, [esp+4]
+    mov esi, [esp+8]
+
+    cld
+
+findEnd:
+    mov al, [edi]
+    cmp al, 0
+    je  append
+    inc edi
+    jmp findEnd
+
+append:
+    mov al, [esi]
+    mov [edi], al
+    cmp al, 0
+    je  done
+    inc edi
+    inc esi
+    jmp append
+
+done:
+    ret 8
+Str_concat ENDP
+
+3. Str_remove Procedure
+Description:
+
+Remove n characters starting at a given position.
+
+Code:Str_remove PROC
+    ; EDI = position to remove from
+    ; ECX = number of chars to remove
+    mov edi, [esp+4]
+    mov ecx, [esp+8]
+
+    ; move source pointer after removed block
+    mov esi, edi
+    add esi, ecx
+
+shiftLoop:
+    lodsb
+    stosb
+    cmp al, 0
+    jne shiftLoop
+
+    ret 8
+Str_remove ENDP
+
+4. Str_find Procedure
+Description:
+
+Find substring inside target.
+If found → ZF=1 and EAX = pointer to match.
+Else → ZF=0.
+
+Code:Str_find PROC
+    mov esi, [esp+4]      ; source
+    mov edi, [esp+8]      ; target
+
+outerLoop:
+    mov eax, edi          ; remember start
+    push esi
+    push edi
+
+compare:
+    mov al, [esi]
+    mov bl, [edi]
+    cmp al, 0
+    je  found
+    cmp al, bl
+    jne notMatch
+    inc esi
+    inc edi
+    jmp compare
+
+found:
+    pop edi
+    pop esi
+    mov eax, edi
+    cmp eax, eax
+    ret 8
+
+notMatch:
+    pop edi
+    pop esi
+    cmp byte ptr [edi], 0
+    je  notFound
+    inc edi
+    jmp outerLoop
+
+notFound:
+    or eax, -1
+    ret 8
+Str_find ENDP
+5. Str_nextWord Procedure
+Description:
+
+Replace delimiter with NULL and return pointer to next word.
+
+Code:Str_nextWord PROC
+    mov edi, [esp+4]      ; string pointer
+    mov al, [esp+8]       ; delimiter
+
+scanLoop:
+    mov bl, [edi]
+    cmp bl, 0
+    je  notFound
+    cmp bl, al
+    je  found
+    inc edi
+    jmp scanLoop
+
+found:
+    mov byte ptr [edi], 0
+    inc edi
+    mov eax, edi
+    cmp eax, eax        ; set ZF=1
+    ret 8
+
+notFound:
+    or eax, -1
+    ret 8
+Str_nextWord ENDP
+
+6. Get_frequencies Procedure
+Description:
+
+Count occurrences of each ASCII char.
+
+Code:Get_frequencies PROC
+    mov esi, [esp+4]
+    mov edi, [esp+8]
+
+countLoop:
+    mov al, [esi]
+    cmp al, 0
+    je  done
+
+    mov ebx, eax
+    shl ebx, 2         ; index * 4
+    inc dword ptr [edi + ebx]
+
+    inc esi
+    jmp countLoop
+
+done:
+    ret 8
+Get_frequencies ENDP
+
+7. Sieve of Eratosthenes (65,000)
+
+Pseudo-MASM (short version):.data?
+sieve BYTE 65000 DUP(?)
+
+.code
+    mov edi, OFFSET sieve
+    mov ecx, 65000
+    cld
+    xor eax, eax
+    rep stosb
+
+    mov ebx, 2
+outer:
+    cmp ebx, 65000
+    jge printPrimes
+
+    cmp sieve[ebx], 0
+    jne skip
+
+    mov esi, ebx*2
+markLoop:
+    cmp esi, 65000
+    jge skip
+    mov sieve[esi], 1
+    add esi, ebx
+    jmp markLoop
+
+skip:
+    inc ebx
+    jmp outer
+
+printPrimes:
+    ; print all where sieve[i] == 0
+8. Optimized Bubble Sort With Exchange Flag
+BubbleSort PROC
+outer:
+    mov exchange, 0
+    mov ecx, arraySize-1
+    mov esi, OFFSET list
+
+inner:
+    mov ax, [esi]
+    cmp ax, [esi+2]
+    jbe skip
+    xchg ax, [esi+2]
+    mov [esi], ax
+    mov exchange, 1
+skip:
+    add esi, 2
+    loop inner
+
+    cmp exchange, 0
+    je done
+    jmp outer
+done:
+    ret
+BubbleSort ENDP
+9. Binary Search Fully Register-Based
+
+Registers:
+
+EAX = value
+
+EBX = first
+
+ECX = last
+
+EDX = mid
+code:BinarySearch PROC
+    mov eax, key
+    xor ebx, ebx
+    mov ecx, arraySize-1
+
+L1:
+    cmp ebx, ecx
+    jg  notFound
+
+    mov edx, ebx
+    add edx, ecx
+    shr edx, 1       ; mid
+
+    mov esi, OFFSET list
+    mov ax, [esi + edx*2]
+
+    cmp ax, key
+    je  found
+    jl  goRight
+
+goLeft:
+    dec edx
+    mov ecx, edx
+    jmp L1
+
+goRight:
+    inc edx
+    mov ebx, edx
+    jmp L1
+
+found:
+    mov eax, edx
+    ret
+
+notFound:
+    mov eax, -1
+    ret
+BinarySearch ENDP
+10. Letter Matrix (random 4×4, 50% vowels)
+
+Pseudo-MASM:
+asm:vowels BYTE "AEIOU"
+
+makeMatrix PROC
+    mov ecx, 16
+    mov edi, OFFSET matrix
+
+nextChar:
+    call RandomRange, 2       ; 0 or 1
+    cmp eax, 0
+    je  makeVowel
+
+    ; consonant
+    call RandomRange, 26
+    add eax, 'A'
+    jmp store
+
+makeVowel:
+    call RandomRange, 5
+    mov al, vowels[eax]
+
+store:
+    mov [edi], al
+    inc edi
+    loop nextChar
+    ret
+makeMatrix ENDP
+11. Letter Matrix – Sets With Exactly Two Vowels
+
+After generating a matrix, scan:
+
+all rows
+
+all columns
+
+diagonals
+Collect sets of 4 letters and count vowels.
+
+(I can generate complete MASM code if you want.)
+12. calc_row_sum Procedure
+
+Parameters (stack order):
+
+array offset
+
+row size
+
+type (1,2,4 bytes)
+
+row index
+
+Code:calc_row_sum PROC
+    push ebp
+    mov  ebp, esp
+
+    mov esi, [ebp+8]      ; array
+    mov ebx, [ebp+20]     ; row index
+    mov ecx, [ebp+12]     ; row size
+    mov edx, [ebp+16]     ; type
+
+    mul edx               ; row offset = index * type
+    add esi, eax
+
+    xor eax, eax
+
+sumLoop:
+    cmp ecx, 0
+    je  done
+
+    cmp edx, 1
+    je  byteCase
+    cmp edx, 2
+    je  wordCase
+
+dwordCase:
+    mov ebx, [esi]
+    add eax, ebx
+    add esi, 4
+    dec ecx
+    jmp sumLoop
+
+wordCase:
+    mov bx, [esi]
+    add eax, ebx
+    add esi, 2
+    dec ecx
+    jmp sumLoop
+
+byteCase:
+    mov bl, [esi]
+    add eax, ebx
+    inc esi
+    dec ecx
+    jmp sumLoop
+
+done:
+    pop ebp
+    ret 16
+calc_row_sum ENDP
+13. Trim Leading Character
+asm:Str_trimLead PROC
+    mov edi, [esp+4]
+    mov al, [esp+8]
+
+startLoop:
+    mov bl, [edi]
+    cmp bl, al
+    jne shift
+
+    inc edi
+    jmp startLoop
+
+shift:
+    mov esi, edi
+    mov edi, [esp+4]
+
+copyLoop:
+    lodsb
+    stosb
+    cmp al, 0
+    jne copyLoop
+
+    ret 8
+Str_trimLead ENDP
+14. Trim Trailing Set of Characters
+
+You receive:
+
+pointer to string
+
+pointer to filter characters
+
+Code:Str_trimSet PROC
+    mov edi, [esp+4]     ; string
+    mov esi, [esp+8]     ; filter set
+
+    ; go to end
+findEnd:
+    cmp byte ptr [edi], 0
+    je  checkBack
+    inc edi
+    jmp findEnd
+
+checkBack:
+    dec edi
+
+checkLoop:
+    mov al, [edi]
+    mov ebx, esi
+
+scanFilter:
+    mov bl, [ebx]
+    cmp bl, 0
+    je  stopTrim
+    cmp bl, al
+    je  doTrim
+    inc ebx
+    jmp scanFilter
+
+stopTrim:
+    inc edi
+    mov byte ptr [edi], 0
+    ret 8
+
+doTrim:
+    dec edi
+    jmp checkLoop
+Str_trimSet ENDP
